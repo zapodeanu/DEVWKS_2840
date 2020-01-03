@@ -57,7 +57,7 @@ This repo will showcase an use case of how to detect and mitigate unauthorized, 
 - Cisco DNA Center
 - IOS XE Network Devices
 
-**Other Platforms**
+**Other Platforms:**
 
 - ServiceNow, Webex Teams
 
@@ -66,6 +66,6 @@ This repo will showcase an use case of how to detect and mitigate unauthorized, 
  - Create additional compliance checks
  - Create northbound APIs to provide additional services like - device configuration file retrieval, configurations search, archiving, reporting
 
-**License**
+**License:**
 
 This project is licensed to you under the terms of the [Cisco Sample Code License](./LICENSE).
