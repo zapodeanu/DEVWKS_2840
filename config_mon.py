@@ -44,7 +44,6 @@ from config import DNAC_PASS, DNAC_USER
 from config import SNOW_DEV
 from config import IOS_XE_USER, IOS_XE_PASS, IOS_XE_PORT
 from config import IOS_XE_HOSTNAME
-from config import NAT
 
 urllib3.disable_warnings(InsecureRequestWarning)  # disable insecure https warnings
 
@@ -148,7 +147,6 @@ def main():
 
         # get the DNA C auth token
         dnac_token = dnac_apis.get_dnac_jwt_token(DNAC_AUTH)
-        print('\nDNA C AUTH TOKEN: ', dnac_token, '\n')
 
         temp_run_config = 'temp_run_config.txt'
 
@@ -207,8 +205,7 @@ def main():
                     device_details = dnac_apis.get_device_health(device, current_time_epoch, dnac_token)
 
                     device_sn = device_details['serialNumber']
-                    private_mngmnt_ip_address = device_details['managementIpAddr']
-                    device_mngmnt_ip_address = NAT[private_mngmnt_ip_address]
+                    device_mngmnt_ip_address = device_details['managementIpAddr']
                     device_family = device_details['platformId']
                     device_os_info = device_details['osType'] + ',  ' + device_details['softwareVersion']
                     device_health = device_details['overallHealth']
@@ -404,8 +401,7 @@ def main():
 
                 # retrieve the device management IP address
 
-                private_mngmnt_ip_address = dnac_apis.get_device_management_ip(device, dnac_token)
-                device_mngmnt_ip_address = NAT[private_mngmnt_ip_address]
+                device_mngmnt_ip_address = dnac_apis.get_device_management_ip(device, dnac_token)
 
                 # Save the running configuration as a baseline configuration local on each device
                 # flash:/config_mon_baseline

@@ -56,10 +56,11 @@ This repo will showcase an use case of how to detect and mitigate unauthorized, 
 
 - Cisco DNA Center
 - IOS XE Network Devices
+- Webex Teams
 
 **Other Platforms:**
 
-- ServiceNow, Webex Teams
+- ServiceNow
 
 **Roadmap:**
  - Build a web based dashboard

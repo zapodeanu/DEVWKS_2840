@@ -33,6 +33,8 @@ import xml.dom.minidom
 import json
 import lxml.etree as et
 import xmltodict
+import time
+from ncclient.operations import RPCError
 
 from ncclient import manager
 
@@ -148,6 +150,45 @@ def netconf_get_int_oper_status(interface, ios_xe_host, ios_xe_port, ios_xe_user
         except:
             oper_status = 'unknown'
         return oper_status
+
+
+def netconf_oper_admin_interface(interface, admin_status, ios_xe_host, ios_xe_port, ios_xe_user, ios_xe_pass):
+    """
+    This function will retrieve the IPv4 address configured on the interface via NETCONF
+    :param interface: interface name
+    :param admin_status: interface admin status {True/False}
+    :param ios_xe_host: device IPv4 address
+    :param ios_xe_port: NETCONF port
+    :param ios_xe_user: username
+    :param ios_xe_pass: password
+    :return oper_status: the interface operational status - up/down
+    """
+    with manager.connect(host=ios_xe_host, port=ios_xe_port, username=ios_xe_user,
+                         password=ios_xe_pass, hostkey_verify=False,
+                         device_params={'name': 'default'},
+                         allow_agent=False, look_for_keys=False) as m:
+        # XML filter to issue with the get operation
+        # IOS-XE 16.6.2+        YANG model called "ietf-interfaces"
+
+        interface_filter = '''
+            <config xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <interfaces xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces">
+                    <interface>
+                      <name>''' + interface + '''</name>
+                      <enabled>''' + admin_status + '''</enabled>
+                    </interface>
+                </interfaces>
+            </config>
+        '''
+        # execute netconf operation
+        try:
+            response = m.edit_config(target='running', config=interface_filter)
+            response_str = json.dumps(xmltodict.parse(str(response)))
+            if 'ok' in response_str:
+                data = 'success'
+        except RPCError as e:
+            data = e._raw
+        return data
 
 
 def netconf_save_running_config_to_file(file_and_path, ios_xe_host, ios_xe_port, ios_xe_user, ios_xe_pass):
@@ -291,7 +332,6 @@ def restconf_create_checkpoint_config(ios_xe_host, ios_xe_user, ios_xe_pass):
     return checkpoint_result
 
 
-
 def restconf_get_capabilities(ios_xe_host, ios_xe_user, ios_xe_pass):
     """
     This function will retrieve the device capabilities via RESTCONF
@@ -304,6 +344,6 @@ def restconf_get_capabilities(ios_xe_host, ios_xe_user, ios_xe_pass):
     url = 'https://' + ios_xe_host + '/restconf/data/netconf-state/capabilities'
     header = {'Content-type': 'application/yang-data+json', 'accept': 'application/yang-data+json'}
     response = requests.get(url, headers=header, verify=False, auth=dev_auth)
-    capabilities_json =  response.json()
+    capabilities_json = response.json()
     return capabilities_json['ietf-netconf-monitoring:capabilities']
 
